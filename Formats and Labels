@@ -1,22 +1,84 @@
 
-
 label tii_4_mom_edu='Moms education at Age 4 PVQ';
 
 proc format;
 /*center*/
     value cnt 
-	      6='UCSF'
-				7='UMN'
-				8='URMC'
-				9='UW'
-				0='ALL';
+	6='UCSF'
+	7='UMN'
+	8='URMC'
+	9='UW';
  /*depression meds*/
- 	value Q6a1_e_yn_fmt
-				. = "No"
-				1 = "Yes";
-	value Q6a1_e_script_fmt
-				. = "No"
-				1 = "Yes";
-	value Q6a1_e_otc_fmt
-				. = "No"
-				1 = "Yes";
+ value Q6a1_e_yn_fmt
+	. = "No"
+	1 = "Yes";
+value Q6a1_e_script_fmt
+	. = "No"
+	1 = "Yes";
+value Q6a1_e_otc_fmt
+	. = "No"
+	1 = "Yes";
+/*health status*/
+value hlth_stat_fmt 
+	1 = "Excellent"
+	2 = "Very Good"
+	3 = "Good"
+	4 = "Fair"
+	5 = "Poor";
+
+/*marital status at T1*/	
+value Q45_fmt
+	1 = "Married"
+	2 = "Living as Married"
+	3 = "Separated"
+	4 = "Divorced"
+	5 = "Widowed"
+	6 = "Single";
+/*race*/
+value Q48_Race_fmt
+        1='Black or African-American' 
+        2='Asian' 
+        4='American Indian or Alaska Native'
+        5='Native Hawaiian or Pacific Islan'
+	6='White'
+	7='More than one race'
+	8='Other'
+	9='Unknown';
+/*hisp/non-hisp*/
+value Q47_Ethnic_fmt
+        . = "Unknown"
+	1 = "Hispanic/Latino"
+	2 = "Not Hispanic/Latino";
+/*education at t1*/
+value T1_mom_edu_fmt
+	1 = "8th Grade or Lower"
+	2 = "Some High School"
+	3 = "High School Grad"
+	4 = "Some College or Tech School"
+	5 = "College Grad"
+	6 = "Some Grad Work or Beyond";
+
+/*Income at T1*/
+value t1_income_fmt
+	1 = "< $15000"
+	2 = "$15000 - 25000"
+	3 = "$25001 - 45000"
+	4 = "$45001 - 55000"
+	5 = "$55001 - 65000"
+	6 = "$65001 - 75000"
+	7 = "> $75000";
+
+/*home*/
+value Q52_fmt
+	1 = "Mobile Home"
+	2 = "Detached One Family House"
+	3 = "Attached One Family House"
+	4 = "Apartment"
+	5 = "Condo"
+	6 = "Other";
+
+/*own/rent*/
+value Q53_fmt
+	1 = "Own or have mortgaged house"
+	2 = "Rent"
+	3 = "Other arrangement";
