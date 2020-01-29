@@ -1,5 +1,6 @@
 
 label tii_4_mom_edu='Moms education at Age 4 PVQ';
+label tii_4_mom_marital='Moms marital status at Age 4 PVQ';
 label t3_Q26       = 'Age of father in years';
 label t3_Q28	   = "Father ethnicity";
 label t3_Q29 	   = "Father race";
@@ -164,3 +165,12 @@ value Q36
 	2 = "Rarely"
 	3 = "Never"
         9 = "Don't know";
+
+/*tii_4_maritalstatus*/
+value tii_4_mar_stat 
+	1='Married' 
+	2='Living as married' 
+	3='Separated' 
+	4='Divorced' 
+	5='Widowed' 
+	6='Single';
