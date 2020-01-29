@@ -1,0 +1,17 @@
+/*Dichotomize Under/Over Mom +/- <35*/
+data BPA_BASC.merged_bpa_bascsrs; set BPA_BASC.merged_bpa_bascsrs;
+if age_yrs < 35 then age_dichotomized=0; else age_dichotomized=1;
+run;
+
+/*log_bpa*/
+data BPA_BASC.Bpat1phenols368_02202019_EI_2; set BPA_BASC.Bpat1phenols368_02202019_EI;
+log_bpa=log(bpa);
+run;
+
+/*BMI - From AM categories*/
+
+/*categorical SRS*/
+/*=<76 severe social deficits
+/*66=< <76 moderate social deficits
+/*60=< <66 mild
+/*<=59
