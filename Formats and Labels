@@ -1,23 +1,67 @@
 
 label tii_4_mom_edu='Moms education at Age 4 PVQ';
+label t3_Q26       = 'Age of father in years';
+label t3_Q28	   = "Father ethnicity";
+label t3_Q29 	   = "Father race";
+label t3_Q30 	   = "Father's education";
+label t3_q31_YN  =  'Marital status changed, yes/no';
+label t3_q31a = 'How has marital status changed';
+label t3_q31b = 'Lived with spouse';	
+label t3_q32     = 'Is there any one special person you feel close with/depend on ';
+label t3_q33     = 'Are there people you feel at ease with an can talk to about private matters and trust to help you?';
+label t3_q34     = 'How often do you wish you knew more people you could talk to ?';
+label t3_q35     = 'How often do you wish you knew more friends/relatives who could help you out ?';
+label t3_q36    ='Would you say you've been overwhelmed by the thought of caring for the new baby?';
+label t3_q37_YN     =   'You or your partner lost a job or was (were) unemployed for one month or longer: Yes or no';
+label t3_q37_T1  =   'Job loss occur in first trimester: yes or no';
+label t3_q37_T2  =   'Job loss occur in second trimester: yes or no';
+label t3_q37_T3  =   'Job loss occur in third trimester: yes or no';	
+label t3_q38_YN     =   'Close family member had seriously illness or injury: Yes or no';
+label t3_q38_T1  =   'Illness/injury in first trimester: yes or no';
+label t3_q38_T2  =   'Illness/injury in second trimester: yes or no';
+label t3_q38_T3  =   'Illness/injury in third trimester: yes or no';	
+label t3_q39_YN     =   'Death of a close family member: Yes or no';
+label t3_q39_T1  =   'Death of a close family member in first trimester: yes or no';
+label t3_q39_T2  =   'Death of a close family member in second trimester: yes or no';
+label t3_q39_T3  =   'Death of a close family member in third trimester: yes or no';	
+label t3_q40_YN     =   'Were you separated, divorced or expereinced difficulties with your partner: Yes or no';
+label t3_q40_T1  =   'Separation, divorce, partner difficulties in first trimester: yes or no';
+label t3_q40_T2  =   'Separation, divorce, partner difficulties in second trimester: yes or no';
+label t3_q40_T3  =   'Separation, divorce, partner difficulties in third trimester: yes or no';	
+label t3_q41_YN     =   'Did you/partner experience serious legal or financial problems: Yes or no';
+label t3_q41_T1  =   'Legal or financial problems in first trimester: yes or no';
+label t3_q41_T2  =   'Legal or financial problems in second trimester: yes or no';
+label t3_q41_T3  =   'Legal or financial problems in third trimester: yes or no';
+label t3_q42_YN     =   'Other major events: Yes or no';
+label t3_q42_T1  =   'Other major events in first trimester: yes or no';
+label t3_q42_T2  =   'Other major events in second trimester: yes or no';
+label t3_q42_T3  =   'Other major events in third trimester: yes or no';
 
 proc format;
+
+/*generic yes_no*/
+value yn_fmt
+	0="No"
+	1="Yes";
+
 /*center*/
     value cnt 
 	6='UCSF'
 	7='UMN'
 	8='URMC'
 	9='UW';
- /*depression meds*/
- value Q6a1_e_yn_fmt
+ 
+/*depression meds*/
+value dep_yn
 	. = "No"
 	1 = "Yes";
-value Q6a1_e_script_fmt
+value dep_rx
 	. = "No"
 	1 = "Yes";
-value Q6a1_e_otc_fmt
+value dep_otc
 	. = "No"
 	1 = "Yes";
+
 /*health status*/
 value hlth_stat_fmt 
 	1 = "Excellent"
@@ -34,6 +78,7 @@ value Q45_fmt
 	4 = "Divorced"
 	5 = "Widowed"
 	6 = "Single";
+
 /*race*/
 value Q48_Race_fmt
         1='Black or African-American' 
@@ -44,11 +89,13 @@ value Q48_Race_fmt
 	7='More than one race'
 	8='Other'
 	9='Unknown';
+
 /*hisp/non-hisp*/
 value Q47_Ethnic_fmt
         . = "Unknown"
 	1 = "Hispanic/Latino"
 	2 = "Not Hispanic/Latino";
+
 /*education at t1*/
 value T1_mom_edu_fmt
 	1 = "8th Grade or Lower"
@@ -82,3 +129,38 @@ value Q53_fmt
 	1 = "Own or have mortgaged house"
 	2 = "Rent"
 	3 = "Other arrangement";
+
+/*T3_q1a*/
+value q31a
+   	0 = "Got married"
+     	1 = "Now living as married"
+     	2 = "Now separated"
+     	3 = "Got divorced"
+     	4 = "Now widowed"
+     	5 = "Now single";
+
+/*T3_q1b*/
+value q31b
+	0 = "All of the time"
+     	1 = "Most of the time"
+     	2 = "Some of the time"
+     	3 = "Not at all";
+
+/T3_Q34*/
+value Q34         
+	0 = "Often"
+	1 = "Sometimes"
+	2 = "Rarely"
+	3 = "Never"
+        9 = "Don't know";
+value Q35
+        0 = "Often"
+	1 = "Sometimes"
+	2 = "Rarely"
+	3 = "Never";
+value Q36   
+	0 = "Often"
+	1 = "Sometimes"
+	2 = "Rarely"
+	3 = "Never"
+        9 = "Don't know";
