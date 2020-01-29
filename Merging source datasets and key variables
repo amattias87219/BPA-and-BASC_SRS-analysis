@@ -1,1 +1,263 @@
+libname BPA_BASC "J:\PM\TIDES_Data\RESEARCH\Output data for analyses\BPA and Age 4 BASC_SRS - Erona Ibroci"; run;
+
+
+/*Set new BPA file w/ numeric study_id variable*/
+data BPA_BASC.Bpat1phenols368_02202019_EI; set BPA_BASC.Bpat1phenols368_02202019;
+study_id=input(studyid,best8.);
+run;
+
+/*sort by study_id*/
+proc sort data=BPA_BASC.Bpat1phenols368_02202019_EI; by study_id; run;
+
+proc sort data=BPA_BASC.Bpat1phenols368_02202019_ei_2; by study_id; run;
+proc sort data=BPA_BASC.Tii_4_bascsrs_2019411; by study_id; run;
+
+/*Merge BPA file w/ BASC/SRS file*/
+proc contents data=BPA_BASC.Q1_20190514 order=varnum; run;
+data bpa_basc.mom_age_q1; set BPA_BASC.Q1_20190514;
+keep study_id Age_Yrs; run;
+proc sort data=bpa_basc.mom_age_q1; by study_id; run;
+
+data BPA_BASC.merged_bpa_bascsrs; merge BPA_BASC.Bpat1phenols368_02202019_ei_2 (in=a) BPA_BASC.Tii_4_bascsrs_2019411 (in=b) bpa_basc.mom_age_q1; 
+by study_id; if a=1; run;
+
+proc contents data=BPA_BASC.merged_bpa_bascsrs order=varnum; run;
+
+data BPA_BASC.merged_bpa_bascsrs_1; set BPA_BASC.merged_bpa_bascsrs;
+keep 
+STUDYID CENTER
+B_PB BP_3 BPA BPS
+E_PB M_PB P_PB 
+B_PB_LOD BP_3_LOD BPA_LOD BPS_LOD 
+E_PB_LOD M_PB_LOD P_PB_LOD
+T1_UrineSG1 T1_UrineSG2 T1_UrineSG
+B_PB_SGadj BP_3_SGadj BPA_SGadj BPS_SGadj
+E_PB_SGadj M_PB_SGadj P_PB_SGadj
+study_id
+log_bpa
+basc_id basc_v1date
+basc_sex basc_dob
+raw_ext t_ext
+raw_int t_int
+raw_bsi t_bsi
+raw_ads t_ads
+raw_hyp t_hyp
+raw_agg t_agg
+raw_anx t_anx
+raw_dep t_dep
+raw_som t_som
+raw_atp t_atp
+raw_wth t_wth
+raw_att t_att
+raw_adp t_adp
+raw_soc t_soc
+raw_act t_act
+raw_com t_com
+tidesii_v1_basc_data_sheet_compl
+srs_id srs_v1date srs_sex
+srs_dob 
+tidesii_v1_srs_data_sheet_comple
+subject_id
+srs_raw_awr rsrs_raw_cog
+srs_raw_com srs_raw_mot
+srs_raw_rrb srs_raw_sci
+srs_raw_tot srs_t_tot
+srs_t_awr rsrs_t_cog
+srs_t_com srs_t_mot
+srs_t_sci srs_t_rrb
+Age_Yrs
+age_dichotomized
+; run;
+
+data BPA_BASC.merged_bpa_bascsrs_1; set BPA_BASC.merged_bpa_bascsrs_1;
+drop tidesii_v1_basc_data_sheet_compl tidesii_v1_srs_data_sheet_comple;
+run;
+
+/*fix order*/
+data BPA_BASC.merged_bpa_bascsrs_1; 
+format 
+study_id
+STUDYID
+CENTER
+B_PB
+B_PB_LOD
+B_PB_SGadj
+BP_3
+BP_3_LOD
+BP_3_SGadj
+BPA
+BPA_LOD
+BPA_SGadj
+BPS
+BPS_LOD
+BPS_SGadj
+E_PB
+E_PB_LOD
+E_PB_SGadj
+M_PB
+M_PB_SGadj
+M_PB_LOD
+P_PB
+P_PB_LOD
+P_PB_SGadj
+log_bpa
+T1_UrineSG1
+T1_UrineSG2
+T1_UrineSG
+basc_id
+basc_v1date
+basc_sex
+basc_dob
+raw_ext
+t_ext
+raw_int
+t_int
+raw_bsi
+t_bsi
+raw_ads
+t_ads
+raw_hyp
+t_hyp
+raw_agg
+t_agg
+raw_anx
+t_anx
+raw_dep
+t_dep
+raw_som
+t_som
+raw_atp
+t_atp
+raw_wth
+t_wth
+raw_att
+t_att
+raw_adp
+t_adp
+raw_soc
+t_soc
+raw_act
+t_act
+raw_com
+t_com
+srs_id
+srs_v1date
+srs_sex
+srs_dob
+subject_id
+srs_raw_awr
+rsrs_raw_cog
+srs_raw_com
+srs_raw_mot
+srs_raw_rrb
+srs_raw_sci
+srs_raw_tot
+srs_t_tot
+srs_t_awr
+rsrs_t_cog
+srs_t_com
+srs_t_mot
+srs_t_sci
+srs_t_rrb
+Age_Yrs
+age_dichotomized
+;
+set BPA_BASC.merged_bpa_bascsrs_1; run;
+
+/*Add T1 Variables*/
+proc contents data=BPA_BASC.Q1_20190514 order=varnum; run;
+
+data BPA_BASC.Q1_20190514_EI; set BPA_BASC.Q1_20190514;
+keep
+study_id
+subject_id
+T1_Q46_DOB
+T1_Q48_Race
+T1_Q47_Ethnic
+MomBMI
+T1_Q4
+T1_Q6A1_E_OTC
+T1_Q6A1_E_SCRIPT
+T1_Q6A1_E_YN
+T1_Q30a_week_Recode
+T1_Q31
+T1_Q32
+T1_Q45
+T1_Q48A
+T1_Q48B
+T1_Q48C
+T1_Q48D
+T1_Q48E
+T1_Q48F
+T1_Q49
+T1_Q50
+T1_Q51
+T1_Q52
+T1_Q53; run;
+
+proc sort data=BPA_BASC.Q1_20190514_EI; by study_id; run;
+
+proc sort data=BPA_BASC.merged_bpa_bascsrs_1; by study_id; run;
+
+data BPA_BASC.merged_bpa_bascsrs_t1; merge BPA_BASC.merged_bpa_bascsrs_1 (in=a) BPA_BASC.Q1_20190514_EI (in=b); 
+by study_id; if a=1; run;
+
+/*Add T3 (aka Merge SLE)*/
+
+proc contents data=BPA_BASC.Q3_22119 order=varnum; run;
+
+data BPA_BASC.Q3_22119_EI; set BPA_BASC.Q3_22119;
+keep
+study_id
+T3_Q19A_DAY
+T3_Q5A1_E_OTC
+T3_Q5A1_E_SCRIPT
+T3_Q5A1_E_YN
+T3_Q26
+T3_Q28
+T3_Q29
+T3_Q30
+T3_Q31A
+T3_Q31B
+T3_Q31_YN
+T3_Q32
+T3_Q33
+T3_Q34
+T3_Q35
+T3_Q36
+T3_Q37
+T3_Q37_T1
+T3_Q37_T2
+T3_Q37_T3
+T3_Q37_YN
+T3_Q38_T1
+T3_Q38_T2
+T3_Q38_T3
+T3_Q38_YN
+T3_Q39_T1
+T3_Q39_T2
+T3_Q39_T3
+T3_Q39_YN
+T3_Q40_T1
+T3_Q40_T2
+T3_Q40_T3
+T3_Q40_YN
+T3_Q41_T1
+T3_Q41_T2
+T3_Q41_T3
+T3_Q41_YN
+T3_Q42_SPECIFY
+T3_Q42_T1
+T3_Q42_T2
+T3_Q42_T3
+T3_Q42_YN; run;
+
+proc sort data=BPA_BASC.Q3_22119_EI; by study_id; run;
+
+proc sort data=BPA_BASC.merged_bpa_bascsrs_t1; by study_id; run;
+
+data BPA_BASC.bpa_bascsrs_t1_t3; merge BPA_BASC.merged_bpa_bascsrs_t1 (in=a) BPA_BASC.Q3_22119_EI (in=b); 
+by study_id; if a=1; run;
+
+
 
