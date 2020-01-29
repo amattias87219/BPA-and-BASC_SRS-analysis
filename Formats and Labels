@@ -1,0 +1,22 @@
+
+
+label tii_4_mom_edu='Moms education at Age 4 PVQ';
+
+proc format;
+/*center*/
+    value cnt 
+	      6='UCSF'
+				7='UMN'
+				8='URMC'
+				9='UW'
+				0='ALL';
+ /*depression meds*/
+ 	value Q6a1_e_yn_fmt
+				. = "No"
+				1 = "Yes";
+	value Q6a1_e_script_fmt
+				. = "No"
+				1 = "Yes";
+	value Q6a1_e_otc_fmt
+				. = "No"
+				1 = "Yes";
