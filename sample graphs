@@ -1,0 +1,14 @@
+%macro srs(variable);
+proc univariate data=BPA_BASC.merged_bpa_bascsrs;
+var &variable;
+histogram;
+run;
+%mend;
+
+%srs(srs_t_awr);
+%srs(rsrs_t_cog);
+%srs(srs_t_com);
+%srs(srs_t_mot);
+%srs(srs_t_rrb);
+%srs(srs_t_sci);
+%srs(srs_t_tot);
