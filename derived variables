@@ -9,9 +9,13 @@ log_bpa=log(bpa);
 run;
 
 /*BMI - From AM categories*/
+/*underweight (BMI<18.5), normal (18.5?BMI<25), overweight (25?BMI<30) and obese (BMI?30)*/
+
 
 /*categorical SRS*/
 /*=<76 severe social deficits
 /*66=< <76 moderate social deficits
 /*60=< <66 mild
 /*<=59
+
+/*smoking*/
