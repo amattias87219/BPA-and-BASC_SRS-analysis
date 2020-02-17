@@ -259,3 +259,75 @@ health_5 = "Health Poor"
 
 dep_no = "No Dep RX Use"
 dep_yes = "Yes Dep RX Use";
+
+*Analysis code*
+
+/*categorical variables frequency tables*/
+proc freq data=; tables log10_bpa_t3 center race_eth income education age_binary hx_percep dep_rx marital SLE /nocol nocum norow;
+format log10_bpaadj_t3 log10_bpaadj_t3. age_binary age_binary. center center. race_eth race_eth. income income. education education. marital marital.
+sle sle. hx_percep hx_percep. dep_rx dep_rx.; run;
+
+/*continuous variables summary statistics */
+proc means data= n mean std median min max maxdec=2;
+var gest_t1_weeks gest_birth_weeks birthweight child_age; run;
+
+/*Summary statistics of BPA (raw) and adjused log10 transformed bpa*/
+proc means data= p5 p25 median p75 p95; var bpa log10_bpaadj;
+/*geometric means*/
+proc ttest data= dist=lognormal; var bpa log10_bpaadj; ods select ConfLimits; run;
+
+/*Summary statistics for each outcome's means by log10 bpa tertile*/
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var t_bsi;
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var t_hyp;
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var t_anx;
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var t_dep;
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var t_att;
+proc means data= n mean std median min max maxdec=2; class log10_bpa_t3; var srs_t_tot;
+
+/*ANOVA comparing each outcome's means by log10 bpa tertile, see pvalue*/
+proc anova data=; class log10_bpa_t3; model t_bsi = log10_bpa_t3; run;
+proc anova data=; class log10_bpa_t3; model t_hyp = log10_bpa_t3; run;
+proc anova data=; class log10_bpa_t3; model t_anx = log10_bpa_t3; run;
+proc anova data=; class log10_bpa_t3; model t_dep = log10_bpa_t3; run;
+proc anova data=; class log10_bpa_t3; model t_att = log10_bpa_t3; run;
+proc anova data=; class log10_bpa_t3; model srs_t_tot = log10_bpa_t3; run;
+run;
+
+/*removing missing outcome data*/
+if t_bsi = . then delete;
+if t_hyp = . then delete;
+if t_anx = . then delete;
+if t_dep = . then delete;
+if t_att = . then delete;
+if srs_t_tot = . then delete;
+
+/*removing missing covariate data*/
+if birthweight = . then delete;
+if gest_t1_weeks = . then delete;
+if gest_birth_weeks = . then delete;
+if age_binary = . then delete;
+if center = . then delete;
+if race_eth = . then delete;
+if income = . then delete;
+if education = . then delete;
+if marital = . then delete;
+if SLE = . then delete;
+if hx_percep = . then delete;
+if dep_rx= . then delete;
+run;
+
+/*Linear Reg by each outcome, see above for reference cats*/
+proc reg data=plots=none;
+model t_bsi = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes;
+model t_hyp = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes;
+model t_anx = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes;
+model t_dep = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes;
+model t_att = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes;
+model srs_t_tot = bpa_med bpa_high age_g_35 UMN URMC UW race_white inc_low inc_med college_more mom_sepdiv mom_single sle_1 sle_2 health_2 health_3 health_4 health_5
+dep_yes; run; quit;
+
