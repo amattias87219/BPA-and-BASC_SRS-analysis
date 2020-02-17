@@ -1,1 +1,261 @@
 code from erona
+
+***Start of recoding & creating new values***
+Gestational age at urine collection
+    Gest_T1_weeks = gestage_u1 / 7;
+
+Gestational age at birth
+    Rename gestage_birth_wks = gest_birth_weeks;
+
+Birth weight
+    Birthweight;
+
+BPA adjusted
+	  Log10_BPA = log10(BPA);
+	  Log10_BPAadj = log10(bpa_sgadj);
+
+Child Age
+    Child_Age= yrdif(basc_dob, basc_v1date, 'actual' );
+  
+Center
+	  Center
+
+Maternal Age Binomial
+    Rename Age_dichotomized = Age_binary;
+
+Race/Ethnicity
+    If T1_Q48_Race = 6 then Race_bi = 1;
+    If T1_Q48_Race ne 6 then Race_bi = 0;
+    If T1_Q47_Ethnic = . then Ethnic_bi = .;
+    If T1_Q47_Ethnic = 1 then Ethnic_bi = 0;
+    If T1_Q47_Ethnic = 2 then Ethnic_bi = 1; run;
+
+    Race_Eth = Race_bi + Ethnic_bi; run;
+    
+    If Race_Eth = 0 then Race_eth=1; run;
+
+Income
+    If T1_Q51 =< 2 then income = 0;
+    If 3 <= T1_Q51 <= 6 then income = 1;
+    If T1_Q51 = 7 then income = 2;
+
+Education
+    If 1 <= T1_Q49 <= 4 then education = 0;
+    If T1_Q49 >= 5 then education = 1;
+
+Marital Status
+    If 1 <= TII_4_MOM_MARITAL <= 2 then marital = 1;
+    If 3 <= TII_4_MOM_MARITAL <= 4 then marital = 2;
+    If TII_4_MOM_MARITAL =6 then marital = 3;	
+    If TII_4_MOM_MARITAL =. then marital = .;
+
+Stressful Life Events
+    SLE_Total = T3_Q37_YN + T3_Q38_YN + T3_Q39_YN + T3_Q40_YN + T3_Q41_YN; run;
+      
+    If SLE_Total = 0 then SLE = 0;
+    If SLE_Total = 1 then SLE = 1;
+    If SLE_Total >= 2 then SLE = 2; run;
+
+Current Health Perception
+    Rename T1_Q4 = hx_percep;
+		
+Depression Medication Use (NOTE: variable is character not numerical -> need to rewrite)
+    If T1_Q6A1_E_YN = . then Dep_Rx = 0; else Dep_rx = 1; run;
+    
+Outcome Score Categories
+/*Behavioral Symptoms Index*/
+	If t_bsi < 60 then bsi_cat = 0;
+	If t_bsi < 70 then bsi_cat = 1;
+	If t_bsi >= 70 then bsi_cat = 2;
+/*Hyperactivity*/
+	If t_hyp < 60 then hyp_cat = 0;
+	If t_hyp < 70 then hyp_cat = 1;
+	If t_hyp >= 70 then hyp_cat = 2;
+/*Anxiety*/
+	If t_anx < 60 then anx_cat = 0;
+	If t_anx < 70 then anx_cat = 1;
+	If t_anx >= 70 then anx_cat = 2;
+/*Depression*/
+	If t_dep < 60 then dep_cat = 0;
+	If t_dep < 70 then dep_cat = 1;
+	If t_dep >= 70 then dep_cat = 2;
+/*Attention*/
+	If t_att < 60 then att_cat = 0;
+	If t_att < 70 then att_cat = 1;
+	If t_att >= 70 then att_cat = 2;
+/*SRS*/
+	If t_srs_tot < 60 then srs_cat = 0;
+	If t_srs_tot < 75 then srs_cat = 1;
+	If t_srs_tot >= 75 then srs_cat = 2; run;
+
+Binary Score Outcomes (NORMAL=0, AT RISK/CLINICALLY SIGNIFICANT=1)
+/*Behavioral Symptoms Index*/
+	If bsi_cat ne 2 then bsi_bi=0; else bsi_bi=1;
+/*Hyperactivity*/
+	If hyp_cat ne 2 then hyp_bi=0; else hyp_bi=1;
+/*Anxiety*/
+	If anx_cat ne 2 then anx_bi=0; else anx_bi=1;
+/*Depression*/
+	If dep_cat ne 2 then dep_bi=0; else dep_bi=1;
+/*Attention*/
+	If att_cat ne 2 then att_bi=0; else att_bi=1;
+/*SRS*/
+	If srs_cat ne 2 then srs_bi=0; else srs_bi=1; run;
+
+***End of recoding & creating new values***
+
+***Ranking log10 transformed BPA**
+Tertile /*used this*/
+proc rank data=example out=example_tertile groups=3;
+var X;
+ranks X_t3;
+proc print data=example_tertile; var X X_t3; run;
+
+Quartile /*did not end up using this*/
+proc rank data=example out=example_quartile groups=4;
+var X;
+ranks X_q4; run;
+proc print data=example_quartile; var X X_q4; run;
+
+***End of ranking***
+
+***Start of Labels and formating values***
+data ____; set ______;
+label
+Gest_t1_weeks="Gestational age at urine collection (weeks)" 
+gest_birth_weeks="Gestational age at birth (weeks)" 
+Birthweight="Birth Weight (kg)"
+Log10_bpa="Log of BPA" 
+Log10_bpaadj="Log of Specific Gravity Adjusted BPA"
+Child_age="Child Age (Years)"
+Age_binary='Maternal Age (Years)' 
+Center="Study Center"
+Race_Eth="Maternal Race/Ethnicity"
+Income="Income ($)" 
+Education="Education Level"
+Marital="Marital Status" 
+SLE="Stressful Life Events (T3)"
+Hx_percep="Current Health Perception" 
+Dep_Rx="Depression Medication Use"
+T_bsi = "BASC Behavioral Symptoms Index"
+T_hyp = "BASC Hyperactivity"
+T_dep = "BASC Depression"
+T_anx = "BASC Anxiety"
+T_att = "BASC Attention"
+Srs_t_tot = "SRS Total"
+Bsi_Cat = "BSI by Category"
+Hyp_cat = "Hyperactivity by Category"
+Dep_cat = "Depression by Category"
+Anx_cat = "Anxiety by Category"
+Att_cat = "Attention by Category"
+Srs_cat = "SRS Total by Category"
+Bsi_bi = "BSI Normal Vs At Risk/Clinical"
+anx_bi = "Anxiety Normal Vs At Risk/Clinical"
+dep_bi = "Depression Normal Vs At Risk/Clinical"
+att_bi = "Attention Normal Vs At Risk/Clinical"
+hyp_bi = "Hyperactivity Normal vs At Risk/Clinical"
+srs_bi = "SRS Total Normal Vs At Risk/Clinical";
+
+proc format;
+	value Center 6="UCSF" 7="UMN" 8="URMC" 9="UW";
+	value Age_binary 0="≤ 35" 1="> 35";
+	value Race_Eth 1="Other" 2="Caucasian";
+	value Income 0="≤ 25,000" 1="25,001 – 75,000" 2="> 75,000";
+	value Education 0="< College" 1="≥ College";
+	value Marital 1="Married" 2="Separated/Divorced" 3="Single";
+	value SLE 0="0" 1="1" 2="≥ 2";
+	value Hx_percep 1="Excellent" 2="Very Good" 3="Good" 4="Fair" 5="Poor";
+	Value Dep_Rx 1="Yes" 0="No";
+	Value Bsi_cat 0 = "Normal (<60)" 1 = "At Risk (60-69)" 2 = "Clinically Significant (≥70)";
+	Value anx_cat 0 = "Normal (<60)" 1 = "At Risk (60-69)" 2 = "Clinically Significant (≥70)";
+	Value dep_cat 0 = "Normal (<60)" 1 = "At Risk (60-69)" 2 = "Clinically Significant (≥70)";
+	Value att_cat 0 = "Normal (<60)" 1 = "At Risk (60-69)" 2 = "Clinically Significant (≥70)";
+	Value hyp_cat 0 = "Normal (<60)" 1 = "At Risk (60-69)" 2 = "Clinically Significant (≥70)";
+	Value SRS_cat 0 = "Normal (<60)" 1 = "Mild Social Impairment (60-74)" 2 = "Severe Social Impairment (≥75)";
+	Value Bsi_bi 0 = "Normal" 1 = "At Risk or Clinically Significant";
+	Value anx_bi 0 = "Normal" 1 = "At Risk or Clinically Significant";
+	Value dep_bi 0 = "Normal" 1 = "At Risk or Clinically Significant";
+	Value att_bi 0 = "Normal" 1 = "At Risk or Clinically Significant";
+	Value srs_bi 0 = "Normal" 1 = "At Risk or Clinically Significant"; run;
+ 
+ ***End of labels and formats***
+ 
+ ***Start of Dummy Variables with labels***
+if log10_bpaadj_t3= 0 then bpa_low=1; else bpa_low=0; *ref;
+if log10_bpaadj_t3 = 1 then bpa_med=1; else bpa_med=0;
+if log10_bpaadj_t3 = 2 then bpa_high=1; else bpa_high=0;
+
+if age_binary = 0 then age_le_35=1; else age_le_35=0; *ref;
+if age_binary = 1 then age_g_35=1; else age_g_35=0;
+
+if center=6 then UCSF=1; else UCSF=0; *ref;
+if center=7 then UMN=1; else UMN=0;
+if center=8 then URMC=1; else URMC=0;
+if center=9 then UW=1; else UW=0;
+
+if race_eth=1 then race_other=1; else race_other=0; *ref;
+if race_eth=2 then race_white=1; else race_white=0;
+
+if income=0 then inc_low=1; else inc_low=0;
+if income=1 then inc_med=1; else inc_med=0;
+if income=2 then inc_high=1; else inc_high=0; *ref;
+
+if education=0 then college_less=1; else college_less=0; *ref;
+if education=1 then college_more=1; else college_more=0;
+
+if marital=1 then mom_married=1; else mom_married=0; *ref;
+if marital=2 then mom_sepdiv=1; else mom_sepdiv=0;
+if marital=3 then mom_single=1; else mom_single=0;
+
+if SLE=0 then SLE_0=1; else SLE_0=0; *ref;
+if SLE=1 then SLE_1=1; else SLE_1=0;
+if SLE=2 then SLE_2=1; else SLE_2=0;
+
+If hx_percep = 1 then health_1=1; else health_1=0; *ref;
+if hx_percep = 2 then health_2=1; else health_2=0;
+if hx_percep = 3 then health_3=1; else health_3=0;
+if hx_percep = 4 then health_4=1; else health_4=0;
+if hx_percep = 5 then health_5=1; else health_5=0;
+
+If dep_rx=0 then dep_no=1; else dep_no=0;  *ref;
+if dep_rx=1 then dep_yes=1; else dep_yes=0;
+
+/*LABELS*/
+Bpa_high = "High BPA"
+Bpa_med = "Medium BPA"
+Bpa_low = "Low BPA"
+
+age_le_35 = "Maternal Age ≤35"
+age_g_35 = "Maternal Age >35"
+
+UCSF = "UCSF Center"
+UMN = "UMN Center"
+URMC = "URMC Center"
+UW = "UW Center"
+
+race_other = "Race/Ethnicity Other"
+race_white = "Race/Ethnicity White Non-Hispanic"
+
+inc_low = "Low Income ≤$25000"
+inc_med = "Medium Income $25000-$75000"
+inc_high = "High Income >$75000"
+
+college_less = "<College"
+college_more = "≥College"
+
+mom_married = "Married"
+mom_sepdiv = "Seperated/Divorced"
+mom_single = "Single"
+
+SLE_0 = "0 SLE"
+SLE_1 = "1 SLE"
+SLE_2 = "≥2 SLE"
+
+health_1 = "Health Excellent"
+health_2 = "Health Very Good"
+health_3 = "Health Good"
+health_4 = "Health Fair"
+health_5 = "Health Poor"
+
+dep_no = "No Dep RX Use"
+dep_yes = "Yes Dep RX Use";
