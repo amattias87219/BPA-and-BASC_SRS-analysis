@@ -262,9 +262,15 @@ dep_yes = "Yes Dep RX Use";
 
 *Analysis code*
 
+/*distribution of log10 adjusted bpa before tertiles*/
+proc univariate data=___ normal; var log10_bpaadj; histogram; run;
+
+/*frequency of log10 adjusted bpa after tertiles*/
+proc freq data=; table log10_bpa_t3/nocol norow nocum; run;
+
 /*categorical variables frequency tables*/
 proc freq data=; tables log10_bpa_t3 center race_eth income education age_binary hx_percep dep_rx marital SLE /nocol nocum norow;
-format log10_bpaadj_t3 log10_bpaadj_t3. age_binary age_binary. center center. race_eth race_eth. income income. education education. marital marital.
+format log10_bpa_t3 log10_bpa_t3. age_binary age_binary. center center. race_eth race_eth. income income. education education. marital marital.
 sle sle. hx_percep hx_percep. dep_rx dep_rx.; run;
 
 /*continuous variables summary statistics */
