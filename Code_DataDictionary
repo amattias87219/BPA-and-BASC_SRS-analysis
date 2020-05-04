@@ -73,4 +73,14 @@ value birthweight_normal
 value age_binary 
   1="≥35yrs" 
   0='<35yrs';
+value bpa_3_fmt
+  0='Tertile 1 (low)'
+  1='Tertile 2 (med)' 
+  2='Tertile 3 (high)';
+value Bpa_2_fmt
+  0='Tertile 1 and 2 (low/med)' 
+  1='Tertile 3 (high)';
+value cat_fmt 
+  0='Normal (<60)' 
+  1='At Risk/Clinical (≥60)';
  run;
