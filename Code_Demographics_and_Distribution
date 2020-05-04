@@ -39,7 +39,7 @@ var birthweight; class birthweight_normal; format birthweight_normal birthweight
 proc means data=ei.recode_cont n nmiss mean std min p25 median p75 max maxdec=2;
 var age_yrs; class age_binary; format age_binary age_binary.;
 
-/*N AND PERCENT FOR EACH CATEGORICAL VARIABLE;
+/*N AND PERCENT FOR EACH CATEGORICAL VARIABLE*/
 proc freq data=ei.recode_cont; tables
  center race_4 marital_2 educ_2 income_3 hx_4 sle_3 gest_birth_term gest_urine_LT13 birthweight_normal
  age_binary/plots=freqplot(scale=percent);
