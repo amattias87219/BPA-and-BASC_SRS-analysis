@@ -1,0 +1,164 @@
+/*Linear regression models for all three: continuous log10_bpa, Bpa_2, bpa_3 (in order)*/
+/*also included LEAST SQUARE MEANS to show adjusted estimate and STD for categorical scores*/
+
+/*Continuous Log10_Bpa*/
+
+/*BEHAVIORAL SYMP INDEX*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_bsi=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*ANXIETY*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_anx=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*DEPRESSION*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_dep=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*HYPERACTIVITY*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_hyp=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*ATTENTION*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_att=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*EXTRA: INTERNALIZING*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_ext=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+/*EXTRA: EXTERNALIZING*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_ext=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+
+
+/*SRS TOTAL*/
+proc glm data=ei.recode_cont_ranks;
+class center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1') hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model srs_t_tot=log10_bpa gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+run;
+
+
+/*BPA 3 TERTILE*/
+/*BEHAVIORAL SYMP INDEX*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_bsi=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*HYPERACTIVITY*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_hyp=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*ANXIETY*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_anx=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*DEPRESSION*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1') educ_2(ref='1');
+model t_dep=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*ATTENTION*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_att=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*EXTRA: INTERNALIZING*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_ext=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*EXTRA: EXTERNALIZING*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_ext=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+
+/*SRS TOTAL*/
+proc glm data=ei.recode_cont_ranks;
+class bpa_3 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model srs_t_tot=bpa_3 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_3/ stderr;
+run;
+
+/*BPA 2 TERTILE*/
+/*BEHAVIORAL SYMP INDEX*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_bsi=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*HYPERACTIVITY*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_hyp=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*ANXIETY*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_anx=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*DEPRESSION*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_dep=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*ATTENTION*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_att=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*EXTRA INTERNALIZATION*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_int=bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*EXTRA EXTERNALIZATION*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0') educ_2(ref='1');
+model t_ext=bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+
+/*SRS TOTAL*/
+proc glm data=ei.recode_cont_ranks;
+class Bpa_2 (ref='0') center(ref='6') race_4(ref='1') marital_2(ref='1') income_3(ref='1')
+hx_4(ref='1') sle_3(ref='0');
+model srs_t_tot=Bpa_2 gest_birth birthweight age_yrs center race_4 marital_2 educ_2 income_3 hx_4 sle_3/solution clparm;
+lsmeans bpa_2/ stderr;
+run;
+
