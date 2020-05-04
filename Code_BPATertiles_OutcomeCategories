@@ -19,7 +19,7 @@ histogram log10_bpa/group=bpa_3;
 proc sgplot data=ei.recode_cont_ranks;
 histogram log10_bpa/group=bpa_2;
 
-/*DISTRIBUTION OF BPA_3 AND BPA_2;
+/*DISTRIBUTION OF BPA_3 AND BPA_2*/
 proc univariate data=ei.recode_cont_ranks outtable=DescStats noprint;
    var bpa_sgadj; class bpa_3; format bpa_3_fmt.;
 proc print data=DescStats noobs;
@@ -34,7 +34,7 @@ run;
 
 
 
-*BASC AND SRS CATEGORIES -- I ONLY MADE THEM INTO NORMAL AND NOT-NORMAL;
+/*BASC AND SRS CATEGORIES -- I ONLY MADE THEM INTO NORMAL AND NOT-NORMAL*/
 data ei.recode_cont_ranks; set ei.recode_cont_ranks;
 if t_bsi <60 then BSI_normal=1; else BSI_normal=0;
 if t_anx <60 then ANX_normal=1; else ANX_normal=0;
@@ -49,7 +49,8 @@ table bsi_normal anx_normal hyp_normal dep_normal att_normal srs_normal/plots=fr
 format bsi_normal cat_fmt. anx_normal cat_fmtl. hyp_normal cat_fmt. dep_normal cat_fmt.
 att_normal cat_fmt. srs_normal cat_fmt.;
 
-/*CHECK DISTRIBUTION OF NORMAL SCORES VS BPA_2 AND BPA_3 (i replaced bpa_2 with bpa_3 instead of writing both out);
+/*CHECK DISTRIBUTION OF NORMAL SCORES VS BPA_2 AND BPA_3 
+(i replaced bpa_2 with bpa_3 instead of writing both out)*/
 proc sgplot data=ei.recode_cont_ranks;
 vbar bsi_normal/group=bpa_2; format bsi_normal cat_fmt. bpa_2 bpa_2_fmt.;
 
@@ -96,10 +97,9 @@ proc anova data=ei.recode_cont_ranks;
 class bpa_2;
 model srs_t_tot = bpa_2; 
 
-/*RETRIEVE SCORE MEANS, STD, MEAN, IQR, MIN/MAX GROUPED BPA_2/3 FOR EACH SCORE;
+/*RETRIEVE SCORE MEANS, STD, MEAN, IQR, MIN/MAX GROUPED BPA_2/3 FOR EACH SCORE*/
 proc sort data=ei.recode_cont_ranks; by bpa_2;
 proc means data=ei.recode_cont_ranks n mean std min max p25 median p75 maxdec=2;
 var t_bsi t_hyp t_anx t_dep t_att srs_t_tot; by bpa_2; run;
 
 /*END OF DOCUMENT*/
-
