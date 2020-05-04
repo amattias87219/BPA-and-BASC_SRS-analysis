@@ -1,0 +1,162 @@
+*This code shows how I got the data for SUMMARY STATS and BPA DISTRIBUTION
+
+I use EI.RECODE_CONT as that was the last step in the previous document;
+
+/*DISTRIBUTION OF UNADJUSTED BPA (WITH NEW LOD) AND BPA SPECIFIC GRAVITY*/
+
+/*GEOMETRIC MEANS AND 95% CONF LIMITS FOR BPA ONLY*/
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+var bpa bpa_lod_new bpa_sgadj; ods select ConfLimits;
+
+/*N, MEAN, STD, MIN/MAX, MEDIAN, IQR, GEOMEAN FOR BPA VARS*/
+proc univariate data=ei.recode_cont outtable=DescStats noprint;
+   var bpa bpa_lod_new bpa_sgadj log10_bpa;
+proc print data=DescStats noobs;
+var _var_ _nobs_ _nmiss_ _MEAN_ _STD_ _MIN_ _Q1_ _MEDIAN_ _Q3_ _MAX_ _GEOMEAN_;
+run;
+
+/*HISTOGRAM FOR BPA VARS*/
+proc univariate data=ei.recode_cont noprint;
+histogram bpa bpa_lod_new bpa_sgadj log10_bpa /normal;
+
+/*MEANS, STDS, MEDIANS, IQRS FOR CONTINUOUS VARIABLES ONLY*/
+proc univariate data=ei.recode_cont outtable=DescStats noprint;
+   var child_age age_binary gest_birth gest_urine birthweight;
+proc print data=DescStats noobs;
+var _var_ _nobs_ _nmiss_ _MEAN_ _STD_ _MIN_ _Q1_ _MEDIAN_ _Q3_ _MAX_ _GEOMEAN_;
+run;
+
+/*MEANS, STDS, MEDIANS, IQR FOR CONTINUOUS VARIABLES THAT I DICHOTOMIZED*/
+proc means data=ei.recode_cont n nmiss mean std min p25 median p75 max maxdec=2;
+var gest_birth; class gest_birth_term; format gest_birth_term gest_birth_term.;
+
+proc means data=ei.recode_cont n nmiss mean std min p25 median p75 max maxdec=2;
+var gest_urine; class gest_urine_LT13; format gest_urine_LT13 gest_urine_LT13_fmt.;
+
+proc means data=ei.recode_cont n nmiss mean std min p25 median p75 max maxdec=2;
+var birthweight; class birthweight_normal; format birthweight_normal birthweight_normal.;
+
+proc means data=ei.recode_cont n nmiss mean std min p25 median p75 max maxdec=2;
+var age_yrs; class age_binary; format age_binary age_binary.;
+
+/*N AND PERCENT FOR EACH CATEGORICAL VARIABLE;
+proc freq data=ei.recode_cont; tables
+ center race_4 marital_2 educ_2 income_3 hx_4 sle_3 gest_birth_term gest_urine_LT13 birthweight_normal
+ age_binary/plots=freqplot(scale=percent);
+format race_4 race_4_fmt. educ_2 educ_2_fmt. income_3 income_3_fmt. marital_2 marital_2_fmt.
+center cnt. hx_4 hx_4_fmt. gest_birth_term gest_birth_term. gest_urine_LT13 gest_urine_LT13_fmt.
+birthweight_normal birthweight_normal. age_binary age_binary.;
+
+/*TRICKIER PART: FINDING GEOMETRIC MEAN OF UNADJUSTED BPA FOR EACH CATEGORICAL VARIABLE;
+TRICKY BECAUSE IT IS EASIER TO DO THIS FOR DICHOTOMIZED VARIABLES, NOT SO MUCH VARIABLES WITH ≥3 GROUPS*/
+
+/*START WITH DICHOTOMOUS VARIABLES. PROC TTEST WILL GIVE YOU PVALUE FOR THIS. NOT FOR ≥3 GROUPS (NEXT STEP)*/
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+	var bpa_LOD_NEW; class marital_2; format marital_2 marital_2.; 
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+	var bpa_LOD_NEW; class educ_2; format educ_2 educ_2_fmt.;
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+  var bpa; class gest_urine_LT13; format gest_urine_LT13 gest_urine_LT13_fmt.; 
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+  var bpa; class gest_birth_term; format gest_birth_term gest_birth_term.;
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+  var bpa; class birthweight_normal; format birthweight_normal birthweight_normal.;
+
+proc ttest data=ei.recode_cont dist=lognormal plots=none;
+  var bpa; class age_binary; format age_binary age_binary.;
+
+/*PROC TTEST CAN GIVE YOU GEOMEANS FOR EACH ≥3 GROUP, BUT WILL NOT DO PVALUE. MUST USE PROC ANOVA (I THINK)*/
+
+proc sort data=ei.recode_cont; by center;
+proc ttest data=ei.recode_cont dist=lognormal;
+	var bpa; by center; format center cnt.; ods select conflimits;
+  
+proc sort data=ei.recode_cont; by race_4;
+proc ttest data=ei.recode_cont dist=lognormal;
+	var bpa; by race_4; format race_4 race_4_fmt.; ods select conflimits;
+  
+proc sort data=ei.recode_cont; by income_3;
+proc ttest data=ei.recode_cont dist=lognormal;
+	var bpa; by income_3; format income_3 income_3_fmt.;
+
+proc sort data=ei.recode_cont; by hx_4;
+proc ttest data=ei.recode_cont dist=lognormal;
+	var bpa; by hx_4; format hx_4 hx_4_fmt.;
+  
+proc sort data=ei.recode_cont; by sle_3;
+proc ttest data=ei.recode_cont dist=lognormal;
+	var bpa; by sle_3; format sle_3 sle_3_fmt.;
+  
+/*PROC ANOVA FOR P-VALUES*/
+proc anova data=ei.recode_cont;
+class center(ref='6');
+ model bpa = center;
+proc anova data=ei.recode_cont;
+ class race_4(ref='1');
+ model bpa = race_4;
+proc anova data=ei.recode_cont;
+ class income_3(ref='1');
+ model bpa = income_3;
+proc anova data=ei.recode_cont;
+ class hx_4(ref='1');
+ model bpa = hx_4;
+proc anova data=ei.recode_cont;
+  class sle_3(ref='1');
+  model bpa=sle_3;
+
+/*HISTOGRAMS SHOWING DISTRIBUTION OF BPA_LOD_NEW AND EACH CATEGORY*/
+/*IF I WANTED TO SEE BPA INSTEAF OF BPA_LOD_NEW I JUST REPLACED THE HISTOGRAM STATEMENT*/
+
+proc univariate data=EI.RECODE_CONT noprint;
+class gest_birth_term; format gest_birth_term gest_birth_term.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class gest_urine_LT13; format gest_urine_LT13 gest_urine_LT13_fmt;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class birthweight_normal; format birthweight_normal birthweight_normal.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class age_binary; format age_binary age_binary.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class race_4; format race_4 race_4_fmt.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class marital_2; format marital_2 marital_2_fmt.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class income_3; format income_3 income_3_fmt.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class educ_2; format educ_2 educ_2_fmt.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+proc univariate data=EI.RECODE_CONT noprint;
+class hx_4; format hx_4 hx_4_fmt.;
+histogram BPA_LOD_NEW;
+inset mean std min median max geomean / format=5.2 position=ne;
+
+/*END OF DOCUMENT*/
+
+
