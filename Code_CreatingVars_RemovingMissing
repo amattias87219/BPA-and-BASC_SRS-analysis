@@ -1,0 +1,208 @@
+/*This code shows how I renamed variables, removed the missing data, and then created new variables.
+
+*Rename the variables for clarity and make new variable for child age and log10_bpa;
+data ei.newest1; set ei.newest;
+Rename T1_Q48_Race = race;
+Rename TII_4_MOM_MARITAL =marital;
+rename T1_Q49=educ;
+rename T1_Q4 =hx;
+rename T3_Q37_YN=sle_q37;
+rename T3_Q38_YN=sle_q38;
+rename T3_Q39_YN=sle_q39;
+rename T3_Q40_YN=sle_q40;
+rename T3_Q41_YN=sle_q41;
+rename T1_Q51 = income;
+Rename gestage_birth_wks = gest_birth;
+Rename Age_dichotomized = Age_binary;
+rename gestage_u1 = Gest_urine_days;
+Child_Age= yrdif(basc_dob, basc_v1date, 'actual');
+Log10_BPA = log10(bpa_sgadj);
+run;
+data ei.newest1; set ei.newest1;
+SLE_TOTAL = sle_q37 + sle_q38 + sle_q39 + sle_q40 + sle_q41;
+run;
+
+*look at child age and log10_bpa, and bpa;
+proc sort; by child_age;
+proc print; var basc_dob basc_v1date child_age bpa log10_bpa; run;
+*of 368 girls, 113 did not have outcome data.
+*368 - 113 = 255 mother/daughter pairs with BPA/Neuro data.;
+
+*Missing data report;
+proc means data=ei.newest1  n nmiss;
+var 
+/*exposures*/ 	bpa bpa_sgadj log10_bpa 
+/*outcomes*/ 	  t_bsi t_anx t_dep t_att t_hyp srs_t_tot
+/*covarites*/	  child_age gest_urine_days
+                age_yrs age_binary birthweight gest_birth center 
+                race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41 
+                sle_total;
+*Exposure:
+	- BPA		0
+	- BPA_SgAdj	0
+	- Log10_BPA	0
+*Outcomes:
+	- BSI	114
+	- Attention	113
+	- Anxiety	114
+	- Hyperactivity	114
+	- Depression	114
+	- Social responsiveness	113
+*Other variables
+	- Child age	113 
+	- Gestational age at urine collection 0
+	- Age  0
+	- Birthweight  1
+	- Gestional age at birth 0
+	- Study center 0
+	- Race 0
+	- Income 18
+	- Education 6
+	- Marital status 109
+	- SLE q38-q41: 18, q37: 19 (exception)
+	- SLE total 18
+	- Health perception 4
+
+Delete all the missing data, one by one
+Proc means to check it after each step;
+
+*remove missing child age;
+data ei.delete1; set ei.newest1;
+if child_age = '.' then delete;
+proc means data=ei.delete1 n nmiss; var bpa bpa_sgadj child_age;
+
+*remove missing birthweight;
+data ei.delete2; set ei.delete1;
+if birthweight = '.' then delete;
+proc means data=ei.delete2 n nmiss; var bpa bpa_sgadj birthweight;
+
+*remove missing income;
+data ei.delete3; set ei.delete2;
+if income = '.' then delete;
+proc means data=ei.delete3 n nmiss; var bpa bpa_sgadj income;
+
+*remove missing marital;
+data ei.delete4; set ei.delete3;
+if marital = '.' then delete;
+proc means data=ei.delete4 n nmiss; var bpa bpa_sgadj marital;
+
+*remove missing education;
+data ei.delete5; set ei.delete4;
+if educ = '.' then delete;
+proc means data=ei.delete5 n nmiss; var bpa bpa_sgadj educ;
+
+*remove missing health perception;
+data ei.delete6; set ei.delete5;
+if hx = '.' then delete;
+proc means data=ei.delete6 n nmiss; var bpa bpa_sgadj hx;
+
+*remove missing sle_total;
+data ei.delete7; set ei.delete6;
+if sle_total = '.' then delete;
+proc means data=ei.delete7 n nmiss; var bpa bpa_sgadj sle_total;
+
+proc means data=ei.delete7  n nmiss;
+var 
+bpa bpa_sgadj log10_bpa 
+t_bsi t_anx t_dep t_att t_hyp srs_t_tot
+child_age gest_urine_days
+age_yrs age_binary birthweight gest_birth center race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41 
+sle_total;
+
+*no more missing data;
+*there was 1 child who did not do all of the scores, but otherwise had complete data;
+*I know proc GLM will only read full observations;
+*new total N = 239;
+
+
+
+*Make categorical variables
+*Check to see distribution of each;
+proc freq data=ei.delete7; 
+tables
+center race marital educ income hx sle_total /plots=freqplot(scale=percent);
+format race Q48_Race_fmt. educ T1_mom_edu_fmt. income t1_income_fmt. marital tii_4_mar_stat.
+center cnt. hx hlth_stat_fmt.;
+
+/*Making new variables, double check with proc freq after each step;
+
+/*RACE*/
+data ei.renaming_var; set ei.delete7;  /*by the way, I kept re-using ei.renaming_var for this step*/
+if race=1 then race_4=2; /*Black*/
+if race=2 then race_4=3; /*Asian*/
+if race=6 then race_4=4; /*White*/
+if race=4 then race_4=1; /*other*/
+if race=5 then race_4=1;
+if race>=7 then race_4=1;
+proc freq; tables race*race_4; format race Q48_Race_fmt.; run;
+
+/*MARITAL STATUS*/
+data ei.renaming_var; set ei.renaming_var;
+if marital=1 then marital_2=2; /*married*/
+if 2<= marital <=6 then marital_2=1; /*other*/;
+proc freq; tables marital*marital_2; format marital tii_4_mar_stat.;
+run;
+
+/*INCOME*/
+data ei.renaming_var; set ei.renaming_var;
+if income=<2 then income_3=1; /*low income <=25k*/
+if 3<= income <=6 then income_3=2; /*medium income <25-75k*/
+if income = 7 then income_3=3;/*high income >75k*/
+proc freq; tables income*income_3; format income t1_income_fmt.; run;
+proc sort data=ei.recode_cat; by descending income_3;
+
+/*EDUCATION*/
+data ei.renaming_var; set ei.renaming_var;
+if educ <=4 then educ_2 = 1; /*Some college or less*/
+if educ >4 then educ_2= 2; /*College grad or higher*/
+proc freq; tables educ*educ_2; format educ T1_mom_edu_fmt.; run;
+
+/*HEALTH PERCEPTION*/
+data ei.renaming_var; set ei.renaming_var;
+if hx=1 then hx_4 = 1; /*excellent*/
+if hx=2 then hx_4 = 2; /*very good*/
+if hx=3 then hx_4 = 3; /*good*/
+if hx=>4 then hx_4 = 4; /*fair/poor */
+proc freq; tables hx*hx_4; format hx hlth_stat_fmt.; run;
+
+/*STRESSFUL LIFE EVENTS*/
+data ei.renaming_var; set ei.renaming_var;
+if sle_total = 0 then SLE_3 = 0; /*no SLE*/
+if sle_total = 1 then SLE_3 = 1; /*1 SLE*/
+if sle_total => 2 then sle_3 = 2; /*≥2 SLE*/
+proc freq; tables sle_total*SLE_3;  run;
+
+/*DOUBLE CHECK EVERYONE AGAIN, LOOK FOR ANYTHING MISSING OR MIS CODED.*/
+proc freq data=ei.renaming_var; tables
+ center race_4 marital_2 educ_2 income_3 hx_4 sle_3 /plots=freqplot(scale=percent);
+format race_4 race_4_fmt. educ_2 educ_2_fmt. income_3 income_3_fmt. marital_2 marital_2_fmt.
+center cnt. hx_4 hx_4_fmt.;
+
+
+*recode the continuous variables;
+
+/*CREATE GESTATIONAL AGE OF URINE COLLECTION INTO WEEKS*/
+/*DICHOTOMIZE GEST AGE OF BIRTH INTO "PRETERM" AND "TERM"*/
+/*DICOTOMIZE BIRTHWEIGHT INTO "LOW" AND "NORMAL"*/
+
+/*QUICK NOTE- "1" MEANS YES TO THE NAME OF THE VARIABLE. 
+FOR EXAMPLE, BIRTHWEIGHT_NORMAL=1 MEANS "YES TO BIRTHWEIGHT BEING NORMAL"*/
+
+/*MADE A NEW DATASET FOR THIS STEP*/
+
+data ei.recode_cont; set ei.renaming_var;
+Gest_urine = gest_urine_days / 7;
+if gest_birth >=37 then gest_birth_term = 1;
+if gest_birth <37 then gest_birth_term = 0;
+if birthweight >2.5 then birthweight_normal=1;
+if birthweight <=2.5 then birthweight_normal=0;
+run;
+
+/*DICHOTOMIZE GESTATIONAL AGE OF URINE COLLECTION INTO "LESS THAN 13 WEEKS" AND "MORE THAN 13 WEEKS" */
+/*MAKE A NEW BPA WITH THE LOD REASSIGNED TO LOD/SQRT(2) AS PER EMILY'S PAPER*/
+data ei.recode_cont; set ei.recode_cont;
+if Gest_urine <13 then gest_urine_LT13 = 1; 
+if gest_urine >=13 then gest_urine_LT13=0;
+if BPA <0.1 then BPA_lod_new = BPA/sqrt(2); else BPA_LOD_NEW=BPA;
+run;
+proc print data=ei.recode_cont; var bpa BPA_LOD_NEW;
