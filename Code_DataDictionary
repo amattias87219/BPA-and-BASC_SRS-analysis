@@ -1,0 +1,76 @@
+/*This file is the data dictionary for the code*/
+/*Parenthesis show the ORIGINAL CODE and the RENAMED CODE (ORIGINAL ----> RENAMED)
+/*Check other file for how I assigned these values
+
+*Exposure:
+	- BPA
+	- BPA_SgAdj
+	- log10-transformed (log10_BPA = log10(bpa_sgadj) --> I used this for continuous analysis)
+		-Tertile (T3, T2, T1) --> BPA_3
+		-Dichotomous tertile (T3 vs T1-T2) --> BPA_2
+		-Continuous --> log10_BPA
+*Outcomes:
+	- BSI (t_bsi)
+	- Attention (t_att)
+	- Anxiety (t_anx) 
+	- Hyperactivity (t_hyp) 
+	- Depression (t_dep) 
+	- Social responsiveness (srs_t_tot)
+
+*Other variables
+	- Child age (child_age	Basc_DOB, srs_dob ---> child_age)
+	- Gestational age at urine collection *(Gest_urine = gestage_u1 / 7);
+     - Dichotomous (gest_urine_LT13)
+	- Age (Age_Yrs)
+     - Dichotomous (age_binary)
+	- Birthweight (birthweight)
+     - Dichotomous (birthweight_normal)
+	- Gestional age at birth (gestage_birth_wks ---> gest_birth)
+     - Dichotomous (gest_birth_term)
+	- Study center (Center)
+	- Race (T1_Q48_Race ---> Race_4)
+	- Income (T1_Q51 ---> income_3)
+	- Education (T1_Q49 ---> educ_2)
+	- Marital status (tii_4_mom_marital ---> marital_2)
+	- Health perception (  ---> hx_4)
+	- Stressful life events (See code below)
+  
+ *LABELS;
+ proc format;
+value race_4_fmt 
+  1='Other'
+  2='Black or African-American'
+  3='Asian'
+  4='White';
+value marital_2_fmt 
+  1='Other' 
+  2='Married';
+value income_3_fmt 
+  1='Low <25k' 
+  2='Medium <25-75k' 
+  3='High >75k';
+value educ_2_fmt 
+  1='Some college or less' 
+   2='College grad or higher';
+value hx_4_fmt 
+  1='Excellent' 
+   2='Very good' 
+   3='Good' 
+   4='Fair/poor';
+value sle_3_fmt 
+  0='0 SLE' 
+  1='1 SLE' 
+  2='≥2 SLE';
+value gest_birth_term 
+  1="Term Birth ≥37" 
+  0='Preterm brith <37';
+value gest_urine_LT13_fmt 
+  1='<13 weeks' 
+  0='≥13 weeks';
+value birthweight_normal 
+  1='Normal BW >2.5kg' 
+  0='Low BW ≤2.5kg';
+value age_binary 
+  1="≥35yrs" 
+  0='<35yrs';
+ run;
