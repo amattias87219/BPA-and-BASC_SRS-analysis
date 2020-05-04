@@ -1,0 +1,105 @@
+/*In this document I make BPA tertiles as well as categorizing outcomes based on their score range*/
+/* I make a new dataset here*/
+
+***BPA tertiles;
+proc rank data=ei.recode_cont out=ei.recode_cont_ranks groups=3;
+var log10_bpa;
+ranks bpa_3;
+data ei.recode_cont_ranks; set ei.recode_cont_ranks;
+if log10_Bpa <= -0.2365720 then bpa_3t= 0;
+if bpa_3= 2 then bpa_2=1; /*high bpa*/
+if bpa_3<2 then bpa_2=0; /*medium/low bpa*/
+run;
+proc sort; by bpa_3;
+proc print; var bpa_3 bpa_2;
+
+/*CHECK TO SEE IF RANKS WORKED*/
+proc sgplot data=ei.recode_cont_ranks;
+histogram log10_bpa/group=bpa_3;
+proc sgplot data=ei.recode_cont_ranks;
+histogram log10_bpa/group=bpa_2;
+
+/*DISTRIBUTION OF BPA_3 AND BPA_2;
+proc univariate data=ei.recode_cont_ranks outtable=DescStats noprint;
+   var bpa_sgadj; class bpa_3; format bpa_3_fmt.;
+proc print data=DescStats noobs;
+var _var_ _nobs_ _nmiss_ _MEAN_ _STD_ _MIN_ _Q1_ _MEDIAN_ _Q3_ _MAX_ _GEOMEAN_;
+run;
+
+proc univariate data=ei.recode_cont_ranks outtable=DescStats noprint;
+   var bpa_sgadj; class bpa_2; format bpa_2_fmt.;
+proc print data=DescStats noobs;
+var _var_ _nobs_ _nmiss_ _MEAN_ _STD_ _MIN_ _Q1_ _MEDIAN_ _Q3_ _MAX_ _GEOMEAN_;
+run;
+
+
+
+*BASC AND SRS CATEGORIES -- I ONLY MADE THEM INTO NORMAL AND NOT-NORMAL;
+data ei.recode_cont_ranks; set ei.recode_cont_ranks;
+if t_bsi <60 then BSI_normal=1; else BSI_normal=0;
+if t_anx <60 then ANX_normal=1; else ANX_normal=0;
+if t_hyp <60 then HYP_normal=1; else HYP_normal=0;
+if t_dep <60 then DEP_normal=1; else DEP_normal=0;
+if t_att <60 then ATT_normal=1; else ATT_normal=0;
+if srs_t_tot <60 then SRS_normal=1; else SRS_normal=0;
+
+/*CHECK FREQUENCY*/
+proc freq data=ei.recode_cont_ranks;
+table bsi_normal anx_normal hyp_normal dep_normal att_normal srs_normal/plots=freqplot(scale=percent);
+format bsi_normal cat_fmt. anx_normal cat_fmtl. hyp_normal cat_fmt. dep_normal cat_fmt.
+att_normal cat_fmt. srs_normal cat_fmt.;
+
+/*CHECK DISTRIBUTION OF NORMAL SCORES VS BPA_2 AND BPA_3 (i replaced bpa_2 with bpa_3 instead of writing both out);
+proc sgplot data=ei.recode_cont_ranks;
+vbar bsi_normal/group=bpa_2; format bsi_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+proc sgplot data=ei.recode_cont_ranks;
+vbar anx_normal/group=bpa_2 groupdisplay=stack stat=percent; format anx_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+proc sgplot data=ei.recode_cont_ranks; 
+vbar dep_normal/group=bpa_2 groupdisplay=stack stat=percent; format dep_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+proc sgplot data=ei.recode_cont_ranks; 
+vbar hyp_normal/group=bpa_2 groupdisplay=stack stat=percent; format hyp_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+proc sgplot data=ei.recode_cont_ranks; 
+vbar att_normal/group=bpa_2 groupdisplay=stack stat=percent; format att_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+proc sgplot data=ei.recode_cont_ranks; 
+vbar srs_normal/group=bpa_2 groupdisplay=stack stat=percent; format srs_normal cat_fmt. bpa_2 bpa_2_fmt.;
+
+/*Check CHISQUARE and RELRISK*/
+/*CHISQUARE FOR BPA_2 AND BPA_3, RELRISK FOR BPA_2*/
+proc freq data=ei.recode_cont_ranks order=formatted;
+table bpa_2*(bsi_normal anx_normal dep_normal hyp_normal att_normal srs_normal)/chisq relrisk norow nocum nopercent nocol;
+format bpa_2 bpa_2_fmt. bsi_normal cat_fmt. anx_normal cat_fmt. dep_normal cat_fmt. hyp_normal cat_fmt.
+att_normal cat_fmt. srs_normal cat_fmt.;
+
+
+/*CHECK SCORE MEANS FOR BOTH BPA_2 AND BPA_3*/
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model t_bsi = bpa_2; 
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model t_hyp = bpa_2; 
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model t_anx = bpa_2; 
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model t_dep = bpa_2; 
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model t_att = bpa_2; 
+proc anova data=ei.recode_cont_ranks;
+class bpa_2;
+model srs_t_tot = bpa_2; 
+
+/*RETRIEVE SCORE MEANS, STD, MEAN, IQR, MIN/MAX GROUPED BPA_2/3 FOR EACH SCORE;
+proc sort data=ei.recode_cont_ranks; by bpa_2;
+proc means data=ei.recode_cont_ranks n mean std min max p25 median p75 maxdec=2;
+var t_bsi t_hyp t_anx t_dep t_att srs_t_tot; by bpa_2; run;
+
+/*END OF DOCUMENT*/
+
