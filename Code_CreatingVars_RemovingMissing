@@ -1,6 +1,6 @@
 /*This code shows how I renamed variables, removed the missing data, and then created new variables.
 
-*Rename the variables for clarity and make new variable for child age and log10_bpa;
+*Rename the variables for clarity and make new variable for child age and log10_bpa*/
 data ei.newest1; set ei.newest;
 Rename T1_Q48_Race = race;
 Rename TII_4_MOM_MARITAL =marital;
