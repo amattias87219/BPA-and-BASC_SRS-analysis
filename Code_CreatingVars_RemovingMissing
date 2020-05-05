@@ -18,6 +18,7 @@ rename gestage_u1 = Gest_urine_days;
 Child_Age= yrdif(basc_dob, basc_v1date, 'actual');
 Log10_BPA = log10(bpa_sgadj);
 run;
+
 data ei.newest1; set ei.newest1;
 SLE_TOTAL = sle_q37 + sle_q38 + sle_q39 + sle_q40 + sle_q41;
 run;
@@ -30,12 +31,12 @@ proc print; var basc_dob basc_v1date child_age bpa log10_bpa; run;
 
 *Missing data report;
 proc means data=ei.newest1  n nmiss;
-var 
-/*exposures*/ 	bpa bpa_sgadj log10_bpa 
+var
+/*exposures*/ 	bpa bpa_sgadj log10_bpa
 /*outcomes*/ 	  t_bsi t_anx t_dep t_att t_hyp srs_t_tot
 /*covarites*/	  child_age gest_urine_days
-                age_yrs age_binary birthweight gest_birth center 
-                race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41 
+                age_yrs age_binary birthweight gest_birth center
+                race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41
                 sle_total;
 *Exposure:
 	- BPA		0
@@ -49,7 +50,7 @@ var
 	- Depression	114
 	- Social responsiveness	113
 *Other variables
-	- Child age	113 
+	- Child age	113
 	- Gestational age at urine collection 0
 	- Age  0
 	- Birthweight  1
@@ -102,11 +103,11 @@ if sle_total = '.' then delete;
 proc means data=ei.delete7 n nmiss; var bpa bpa_sgadj sle_total;
 
 proc means data=ei.delete7  n nmiss;
-var 
-bpa bpa_sgadj log10_bpa 
+var
+bpa bpa_sgadj log10_bpa
 t_bsi t_anx t_dep t_att t_hyp srs_t_tot
 child_age gest_urine_days
-age_yrs age_binary birthweight gest_birth center race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41 
+age_yrs age_binary birthweight gest_birth center race income marital educ hx sle_q37 sle_q38 sle_q39 sle_q40 sle_q41
 sle_total;
 
 *no more missing data;
@@ -118,7 +119,7 @@ sle_total;
 
 *Make categorical variables
 *Check to see distribution of each;
-proc freq data=ei.delete7; 
+proc freq data=ei.delete7;
 tables
 center race marital educ income hx sle_total /plots=freqplot(scale=percent);
 format race Q48_Race_fmt. educ T1_mom_edu_fmt. income t1_income_fmt. marital tii_4_mar_stat.
@@ -185,7 +186,7 @@ center cnt. hx_4 hx_4_fmt.;
 /*DICHOTOMIZE GEST AGE OF BIRTH INTO "PRETERM" AND "TERM"*/
 /*DICOTOMIZE BIRTHWEIGHT INTO "LOW" AND "NORMAL"*/
 
-/*QUICK NOTE- "1" MEANS YES TO THE NAME OF THE VARIABLE. 
+/*QUICK NOTE- "1" MEANS YES TO THE NAME OF THE VARIABLE.
 FOR EXAMPLE, BIRTHWEIGHT_NORMAL=1 MEANS "YES TO BIRTHWEIGHT BEING NORMAL"*/
 
 /*MADE A NEW DATASET FOR THIS STEP*/
@@ -201,7 +202,7 @@ run;
 /*DICHOTOMIZE GESTATIONAL AGE OF URINE COLLECTION INTO "LESS THAN 13 WEEKS" AND "MORE THAN 13 WEEKS" */
 /*MAKE A NEW BPA WITH THE LOD REASSIGNED TO LOD/SQRT(2) AS PER EMILY'S PAPER*/
 data ei.recode_cont; set ei.recode_cont;
-if Gest_urine <13 then gest_urine_LT13 = 1; 
+if Gest_urine <13 then gest_urine_LT13 = 1;
 if gest_urine >=13 then gest_urine_LT13=0;
 if BPA <0.1 then BPA_lod_new = BPA/sqrt(2); else BPA_LOD_NEW=BPA;
 run;
